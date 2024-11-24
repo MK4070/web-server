@@ -3,8 +3,72 @@ import os
 
 class ServerException(Exception): pass
 
+class case_no_file(object):
+    '''File or directory does not exist.'''
+
+    def test(self, handler):
+        return not os.path.exists(handler.full_path)
+    
+    def act(self, handler):
+        raise ServerException(f"{handler.path} not found")
+
+class case_existing_file(object):
+    '''File exists.'''
+
+    def test(self, handler):
+        return os.path.isfile(handler.full_path)
+    
+    def act(self, handler):
+        handler.handle_file(handler.full_path)
+
+class case_always_fail(object):
+    '''Base case.'''
+
+    def test(self, handler):
+        return True
+    
+    def act(self, handler):
+        raise ServerException(f"Unknown object {handler.path}")
+
+class case_directory_index_file(object):
+    '''Serve index.html page for a directory.'''
+
+    def index_path(self, handler):
+        return os.path.join(handler.full_path, 'index.html')
+
+    def test(self, handler):
+        return os.path.isdir(handler.full_path) and \
+               os.path.isfile(self.index_path(handler))
+    
+    def act(self, handler):
+        handler.handle_file(self.index_path(handler))
+
+class case_directory_no_index_file(object):
+    '''Serve listing for a directory without an index.html page.'''
+
+    def index_path(self, handler):
+        return os.path.join(handler.full_path, 'index.html')
+
+    def test(self, handler):
+        return os.path.isdir(handler.full_path) and \
+               not os.path.isfile(self.index_path(handler))
+    
+    def act(self, handler):
+        handler.list_dir(handler.full_path)
+
 class RequestHandler(BaseHTTPRequestHandler):
-    '''Handle HTTP requests by returning a fixed 'page'.'''
+    '''
+    If the requested path maps to a file, that file is served.
+    If anything goes wrong, an error page is constructed.
+    '''
+
+    Cases = [case_no_file, 
+             case_existing_file,
+             case_directory_index_file,
+             case_directory_no_index_file,
+             case_always_fail,
+            ]
+
     Error_page = '''\
     <html>
     <body>
@@ -13,6 +77,26 @@ class RequestHandler(BaseHTTPRequestHandler):
     </body>
     </html>
     '''
+
+    Listing_Page = '''\
+    <html>
+    <body>
+    <h2>Accessing {0}</h2>
+    <ul>{1}</ul>
+    </body>
+    </html>
+    '''
+
+    def list_dir(self, full_path):
+        try:
+            entries = os.listdir(full_path)
+            bullets = [f"<li>{e}</li>" for e in entries if not e.startswith('.')]
+            page = self.Listing_Page.format(self.path, '\n'.join(bullets))
+            self.send_content(page.encode())
+        except OSError as msg:
+            msg = f"{self.path} cannot be listed. {msg}"
+            self.handle_error(msg)
+
     def handle_file(self, full_path):
         """Handles the serving of the requested file."""
         try:
@@ -40,16 +124,14 @@ class RequestHandler(BaseHTTPRequestHandler):
     # Handle a GET request.
     def do_GET(self):
         try:
-            full_path = os.getcwd() + self.path
-            # doesn't exist
-            if not os.path.exists(full_path):
-                raise ServerException(f"{self.path} not found.")
-            # it's a file
-            elif os.path.isfile(full_path):
-                self.handle_file(full_path)
-            # something we don't handle
-            else:
-                raise ServerException(f"Unknown object {self.path}")
+            self.full_path = os.getcwd() + self.path
+            
+            for case in self.Cases:
+                handler = case()
+                if handler.test(self):
+                    handler.act(self)
+                    break
+
         except Exception as msg:
             self.handle_error(msg)
 
