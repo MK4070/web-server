@@ -1,57 +1,44 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import os
-
-class ServerException(Exception): pass
 
 class RequestHandler(BaseHTTPRequestHandler):
     '''Handle HTTP requests by returning a fixed 'page'.'''
-    Error_page = '''\
-    <html>
-    <body>
-    <h1>Error accessing {path}</h1>
-    <p>{msg}</p>
-    </body>
-    </html>
-    '''
-    def handle_file(self, full_path):
-        """Handles the serving of the requested file."""
-        try:
-            # bad idea
-            # reading the whole file into memory when serving
-            with open(full_path, 'rb') as reader:
-                content = reader.read()
-            self.send_content(content)
-        except IOError as msg:
-            msg = f"{self.path} cannot be read: {msg}"
-            self.handle_error(msg)
-
-    def handle_error(self, msg):
-        """Handles errors by sending a generic error page."""
-        content = self.Error_page.format(path=self.path, msg=msg)
-        self.send_content(content.encode(), 404)
-
-    def send_content(self, content, status=200):
-        self.send_response(status)
-        self.send_header("Content-type", "text/html")
-        self.send_header("Content-Length", str(len(content)))
-        self.end_headers()
-        self.wfile.write(content)
+    Page = '''\
+<html>
+<body>
+<table>
+<tr>  <td>Header</td>         <td>Value</td>          </tr>
+<tr>  <td>Date and time</td>  <td>{date_time}</td>    </tr>
+<tr>  <td>Client host</td>    <td>{client_host}</td>  </tr>
+<tr>  <td>Client port</td>    <td>{client_port}s</td> </tr>
+<tr>  <td>Command</td>        <td>{command}</td>      </tr>
+<tr>  <td>Path</td>           <td>{path}</td>         </tr>
+</table>
+</body>
+</html>
+'''
 
     # Handle a GET request.
     def do_GET(self):
-        try:
-            full_path = os.getcwd() + self.path
-            # doesn't exist
-            if not os.path.exists(full_path):
-                raise ServerException(f"{self.path} not found.")
-            # it's a file
-            elif os.path.isfile(full_path):
-                self.handle_file(full_path)
-            # something we don't handle
-            else:
-                raise ServerException(f"Unknown object {self.path}")
-        except Exception as msg:
-            self.handle_error(msg)
+        page = self.create_page()
+        self.send_page(page)
+
+    def create_page(self):
+        values = {
+            'date_time'   : self.date_time_string(),
+            'client_host' : self.client_address[0],
+            'client_port' : self.client_address[1],
+            'command'     : self.command,
+            'path'        : self.path
+        }
+        page = self.Page.format(**values)
+        return page
+
+    def send_page(self, page):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.send_header("Content-Length", str(len(page)))
+        self.end_headers()
+        self.wfile.write(page.encode())
 
 if __name__ == '__main__':
     serverAddress = ('', 8080)
