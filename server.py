@@ -4,7 +4,7 @@ import os
 class ServerException(Exception): pass
 
 class RequestHandler(BaseHTTPRequestHandler):
-    '''Handle HTTP requests by returning a fixed 'page'.'''
+    '''Handle HTTP requests by serving pages from the disk'''
     Error_page = '''\
     <html>
     <body>
