@@ -10,7 +10,13 @@ A simple, customizable web server implementation in Python. This project demonst
 
 ## Description
 
-This project implements a basic web server using Python's built-in libraries. So far it supports HTTP requests, handles routing, serves static files, directory listings and cgi support.
+This project implements a basic web server using Python's built-in libraries. In the latest version it has 
+- HTTP requests
+- Handles routing
+- Static files
+- Directory listings
+- CGI
+- Load Balancing
 
 ## Installation
 
