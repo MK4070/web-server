@@ -6,7 +6,6 @@ A simple, customizable web server implementation in Python. This project demonst
 
 - [Description](#description)
 - [Installation](#installation)
-- [Usage](#usage)
 
 ## Description
 
@@ -26,12 +25,3 @@ Clone the repository:
    ```bash
    git clone https://github.com/MK4070/web-server.git
    ```
-
-## Usage
-
-To run the server 
-
-```bash
-python server.py
-```
-By default the server will start on ```http://127.0.0.1:8080```.
