@@ -1,8 +1,13 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 import subprocess
+import configparser
+import threading
 
 # import sys
+
+config = configparser.ConfigParser()
+config.read("config.ini")
 
 
 class ServerException(Exception):
@@ -182,23 +187,27 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.handle_error(msg)
 
 
-def run():
-    ports = [8081, 8082]
-    for p in ports:
-        serverAddress = ("", p)
-        server = HTTPServer(serverAddress, RequestHandler)
+def start_server(port):
+    with HTTPServer(("", port), RequestHandler) as server:
+        print(f"Serving on port {port}")
         server.serve_forever()
+
+
+def run():
+    starting_port = config.getint("Server", "startingPort")
+    server_count = config.getint("Server", "serverCount")
+    ports = [starting_port + i for i in range(server_count)]
+    for p in ports:
+        thread = threading.Thread(target=start_server, args=(p,))
+        thread.daemon = True
+        thread.start()
+    print("CTRL+C to exit.")
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        print("\nServers stopped.")
 
 
 if __name__ == "__main__":
     run()
-    # try:
-    #     if len(sys.argv) < 2:
-    #         raise Exception("No port defined")
-    # except Exception as e:
-    #     print(e)
-    #     exit()
-    # port = int(sys.argv[1])
-    # serverAddress = ("", port)
-    # server = HTTPServer(serverAddress, RequestHandler)
-    # server.serve_forever()

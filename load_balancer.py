@@ -1,13 +1,23 @@
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 import requests
 import random
+import configparser
+
+config = configparser.ConfigParser()
+config.read("config.ini")
 
 
 class ReverseProxyHandler(SimpleHTTPRequestHandler):
-    BACKEND_SERVERS = [
-        "http://localhost:8081",
-        "http://localhost:8082",
-    ]
+    BACKEND_SERVERS = []
+
+    def __init__(self, request, client_address, server, *, directory=None):
+        starting_port = config.getint("Server", "startingPort")
+        server_count = config.getint("Server", "serverCount")
+        self.BACKEND_SERVERS = [
+            "http://localhost:" + str(starting_port + i)
+            for i in range(server_count)
+        ]
+        super().__init__(request, client_address, server, directory=directory)
 
     def do_GET(self):
         backend_url = self.select_backend_server()
@@ -35,7 +45,12 @@ class ReverseProxyHandler(SimpleHTTPRequestHandler):
         return random.choice(self.BACKEND_SERVERS)
 
 
-if __name__ == "__main__":
-    serverAddress = ("", 8080)
-    server = HTTPServer(serverAddress, ReverseProxyHandler)
+def run():
+    port = config.getint("LB", "port")
+    server = HTTPServer(("", port), ReverseProxyHandler)
+    print(f"Serving on port {port}")
     server.serve_forever()
+
+
+if __name__ == "__main__":
+    run()
