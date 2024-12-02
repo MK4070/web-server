@@ -4,7 +4,6 @@ import subprocess
 import configparser
 import threading
 
-# import sys
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -185,6 +184,14 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         except Exception as msg:
             self.handle_error(msg)
+
+    def log_request(self, code="-", size="-"):
+        log_message = "\nResponse from {}:{}".format(
+            self.server.server_address[0],  # Server IP
+            self.server.server_address[1],  # Server Port
+        )
+        print(log_message)
+        return super().log_request(code, size)
 
 
 def start_server(port):
