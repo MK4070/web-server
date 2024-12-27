@@ -6,17 +6,16 @@ A simple, customizable web server implementation in Python. This project demonst
 
 - [Description](#description)
 - [Installation](#installation)
-- [Usage](#usage)
 
 ## Description
 
-This project implements a basic web server using Python's built-in libraries. In the latest version it has 
+This project implements a basic web server using Python's built-in libraries. In the latest version it supports 
 - HTTP requests
 - Handles routing
-- Static files
+- Serving static files
 - Directory listings
-- CGI
-- Load Balancing
+- Loading CGI files
+- Reverse Proxy Load Balancing
 
 ## Installation
 
@@ -26,12 +25,3 @@ Clone the repository:
    ```bash
    git clone https://github.com/MK4070/web-server.git
    ```
-
-## Usage
-
-To run the server 
-
-```bash
-python server.py
-```
-By default the server will start on ```http://127.0.0.1:8080```.
