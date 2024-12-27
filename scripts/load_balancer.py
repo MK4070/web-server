@@ -1,23 +1,22 @@
-from http.server import SimpleHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import requests
 import random
-import configparser
+from utils.config_reader import Config
 
-config = configparser.ConfigParser()
-config.read("config.ini")
+config = Config.get_config()
 
 
-class ReverseProxyHandler(SimpleHTTPRequestHandler):
+class ReverseProxyHandler(BaseHTTPRequestHandler):
     BACKEND_SERVERS = []
 
-    def __init__(self, request, client_address, server, *, directory=None):
+    def __init__(self, request, client_address, server, **kwargs):
         starting_port = config.getint("Server", "startingPort")
         server_count = config.getint("Server", "serverCount")
         self.BACKEND_SERVERS = [
             "http://localhost:" + str(starting_port + i)
             for i in range(server_count)
         ]
-        super().__init__(request, client_address, server, directory=directory)
+        super().__init__(request, client_address, server, **kwargs)
 
     def do_GET(self):
         backend_url = self.select_backend_server()

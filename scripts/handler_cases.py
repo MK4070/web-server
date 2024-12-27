@@ -1,19 +1,9 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 import subprocess
-import configparser
-import threading
+from exceptions import ServerException
 
 
-config = configparser.ConfigParser()
-config.read("config.ini")
-
-
-class ServerException(Exception):
-    pass
-
-
-class base_class(object):
+class ParentCase(object):
     """Parent for case handlers."""
 
     def handle_file(self, handler, full_path):
@@ -38,7 +28,8 @@ class base_class(object):
         assert False, "Not implemented."
 
 
-class case_no_file(base_class):
+# Case Handlers
+class CaseNoFile(ParentCase):
     """File or directory does not exist."""
 
     def test(self, handler):
@@ -48,7 +39,7 @@ class case_no_file(base_class):
         raise ServerException(f"{handler.path} not found")
 
 
-class case_existing_file(base_class):
+class CaseExistingFile(ParentCase):
     """File exists."""
 
     def test(self, handler):
@@ -58,7 +49,7 @@ class case_existing_file(base_class):
         self.handle_file(handler, handler.full_path)
 
 
-class case_always_fail(base_class):
+class CaseAlwaysFail(ParentCase):
     """Base case."""
 
     def test(self, handler):
@@ -68,7 +59,7 @@ class case_always_fail(base_class):
         raise ServerException(f"Unknown object {handler.path}")
 
 
-class case_directory_index_file(base_class):
+class CaseDirectoryIndexFile(ParentCase):
     """Serve index.html page for a directory."""
 
     def test(self, handler):
@@ -80,7 +71,7 @@ class case_directory_index_file(base_class):
         self.handle_file(handler, self.index_path(handler))
 
 
-class case_directory_no_index_file(base_class):
+class CaseDirectoryNoIndexFile(ParentCase):
     """Serve listing for a directory without an index.html page."""
 
     Listing_Page = """\
@@ -113,7 +104,7 @@ class case_directory_no_index_file(base_class):
         self.list_dir(handler)
 
 
-class case_cgi_file(base_class):
+class CaseCGIFile(ParentCase):
     """Something runnable."""
 
     def run_cgi(self, handler):
@@ -140,81 +131,11 @@ class case_cgi_file(base_class):
         self.run_cgi(handler)
 
 
-class RequestHandler(BaseHTTPRequestHandler):
-    Cases = [
-        case_no_file,
-        case_cgi_file,
-        case_existing_file,
-        case_directory_index_file,
-        case_directory_no_index_file,
-        case_always_fail,
-    ]
-
-    Error_page = """\
-    <html>
-    <body>
-    <h1>Error accessing {path}</h1>
-    <p>{msg}</p>
-    </body>
-    </html>
-    """
-
-    def handle_error(self, msg):
-        """Handles errors by sending a generic error page."""
-        content = self.Error_page.format(path=self.path, msg=msg)
-        self.send_content(content.encode(), 404)
-
-    def send_content(self, content, status=200):
-        self.send_response(status)
-        self.send_header("Content-type", "text/html")
-        self.send_header("Content-Length", str(len(content)))
-        self.end_headers()
-        self.wfile.write(content)
-
-    # Handle a GET request.
-    def do_GET(self):
-        try:
-            self.full_path = os.getcwd() + self.path
-
-            for case in self.Cases:
-                handler = case()
-                if handler.test(self):
-                    handler.act(self)
-                    break
-
-        except Exception as msg:
-            self.handle_error(msg)
-
-    def log_request(self, code="-", size="-"):
-        log_message = "\nResponse from {}:{}".format(
-            self.server.server_address[0],  # Server IP
-            self.server.server_address[1],  # Server Port
-        )
-        print(log_message)
-        return super().log_request(code, size)
-
-
-def start_server(port):
-    with HTTPServer(("", port), RequestHandler) as server:
-        print(f"Serving on port {port}")
-        server.serve_forever()
-
-
-def run():
-    starting_port = config.getint("Server", "startingPort")
-    server_count = config.getint("Server", "serverCount")
-    ports = [starting_port + i for i in range(server_count)]
-    for p in ports:
-        thread = threading.Thread(target=start_server, args=(p,))
-        thread.daemon = True
-        thread.start()
-    print("CTRL+C to exit.")
-    try:
-        while True:
-            pass
-    except KeyboardInterrupt:
-        print("\nServers stopped.")
-
-
-if __name__ == "__main__":
-    run()
+Cases = [
+    CaseNoFile,
+    CaseCGIFile,
+    CaseExistingFile,
+    CaseDirectoryIndexFile,
+    CaseDirectoryNoIndexFile,
+    CaseAlwaysFail,
+]
