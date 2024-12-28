@@ -16,6 +16,7 @@ This project implements a basic web server using Python's built-in libraries. In
 - Directory listings
 - Loading CGI files
 - Reverse Proxy Load Balancing
+- Server Logging
 
 ## Installation
 
