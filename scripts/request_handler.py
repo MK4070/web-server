@@ -1,6 +1,7 @@
 import os
 from http.server import BaseHTTPRequestHandler
 from handler_cases import Cases
+from utils.logger import common_logger, get_thread_logger
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -40,9 +41,19 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.handle_error(msg)
 
     def log_request(self, code="-", size="-"):
-        log_message = "Response from {}:{}".format(
-            self.server.server_address[0],  # Server IP
-            self.server.server_address[1],  # Server Port
+        log_message = (
+            f"Request from "
+            f"{self.client_address[0]}:{self.client_address[1]}"
+            f" - [{self.command} {self.path} {self.request_version}]"
+            f" - {code} {size}"
         )
-        print(log_message)
-        return super().log_request(code, size)
+        logger = get_thread_logger(self.server.name)
+        logger.info(log_message)
+
+        common_message = (
+            f"({self.server.name} - {self.server.num_requests})"
+            f" - {self.client_address[0]}:{self.client_address[1]}"
+            f" - [{self.command} {self.path} {self.request_version}]"
+            f" - {code} {size}"
+        )
+        common_logger.info(common_message)
