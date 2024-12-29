@@ -33,9 +33,10 @@ jobs:
     - name: Run super-linter
       uses: github/super-linter@v4
       env:
+        RUN_LOCAL: false
         VALIDATE_ALL_CODEBASE: true
         VALIDATE_PYTHON_BLACK: true
         VALIDATE_HTML: true
         LINTER_RULES_PATH: ./
-        BLACK_CONFIG: pyproject.toml
+        PYTHON_BLACK_CONFIG_FILE: pyproject.toml
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
