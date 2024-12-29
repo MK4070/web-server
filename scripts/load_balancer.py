@@ -1,3 +1,5 @@
+# import sys
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import requests
 import random
@@ -48,7 +50,7 @@ class ReverseProxyHandler(BaseHTTPRequestHandler):
 def run():
     port = config.getint("LB", "port")
     server = HTTPServer(("", port), ReverseProxyHandler)
-    print(f"Serving on port {port}")
+    print(f"Load Balancer running on port {port}")
     print("CTRL+C to exit.")
     try:
         server.serve_forever()

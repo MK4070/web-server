@@ -1,6 +1,6 @@
 import os
 import subprocess
-from exceptions import ServerException
+from scripts.exceptions import ServerException
 
 
 class ParentCase(object):

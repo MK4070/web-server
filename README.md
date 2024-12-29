@@ -6,7 +6,8 @@ A simple, customizable web server implementation in Python. This project demonst
 ## Table of Contents
 
 - [Description](#description)
-- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
 
 ## Description
 
@@ -19,11 +20,25 @@ This project implements a basic web server using Python's built-in libraries. In
 - Reverse Proxy Load Balancing
 - Server Logging
 
-## Installation
+## Usage
 
 To get started with this project, you can clone the repository and install the necessary dependencies.
 
-Clone the repository:
-   ```bash
-   git clone https://github.com/MK4070/web-server.git
-   ```
+1. Clone the repository:
+```bash
+git clone https://github.com/MK4070/web-server.git
+```
+\
+2. Navigate to the Project Directory:
+```bash
+cd web-server
+python main.py
+```
+
+## Configuration 
+The server can be customized by modifying the `config.ini` file. This file allows you to set parameters such as the host, port, and other server settings.
+
+Serving Static Files and CGI: 
+Place any static files or CGI scripts you wish to serve in the `static` directory. The server is configured to serve files from this directory.
+
+Server logs are stored in the `logs` directory. You can monitor this directory to review server logs.
