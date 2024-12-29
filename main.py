@@ -7,7 +7,7 @@ def run_in_terminal(script_path, terminal_command):
         command = f"start {terminal_command} /K python -m {script_path}"
     elif sys.platform == "darwin" or sys.platform == "linux":
         command = (
-            f'{terminal_command} -e "python3 -m {script_path}; exec bash"'
+            f'{terminal_command} -c "python3 -m {script_path}; exec bash"'
         )
     else:
         raise OSError("Unsupported OS")
@@ -24,7 +24,7 @@ def run():
     elif sys.platform == "darwin":
         terminal = "osascript -e 'tell app \"Terminal\" to do script'"
     elif sys.platform == "linux":
-        terminal = "gnome-terminal"
+        terminal = "sh"
 
     try:
         run_in_terminal(server, terminal)
