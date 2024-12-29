@@ -1,9 +1,12 @@
+# import sys
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import threading
 import os
 from utils.config_reader import Config
 from utils.logger import common_logger, get_thread_logger
-from handler_cases import Cases
+from scripts.handler_cases import Cases
 
 
 class RequestHandler(BaseHTTPRequestHandler):
