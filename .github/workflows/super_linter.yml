@@ -6,7 +6,7 @@ on:
       - '**' 
       
 jobs:
-  setup:
+  super-lint:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -30,13 +30,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-python-
 
-  super-lint:
-      runs-on: ubuntu-latest
-      steps:
-      - name: Run super-linter
-        uses: github/super-linter@v4
-        env:
-          VALIDATE_ALL_CODEBASE: true
-          VALIDATE_PYTHON_BLACK: true
-          VALIDATE_HTML: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Run super-linter
+      uses: github/super-linter@v4
+      env:
+        VALIDATE_ALL_CODEBASE: true
+        VALIDATE_PYTHON_BLACK: true
+        VALIDATE_HTML: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
