@@ -1,4 +1,4 @@
-[![Lint Code](https://github.com/MK4070/web-server/actions/workflows/super_linter.yml/badge.svg)](https://github.com/MK4070/web-server/actions/workflows/super_linter.yml)
+[![super-linter](https://github.com/MK4070/web-server/actions/workflows/super_linter.yml/badge.svg)](https://github.com/MK4070/web-server/actions/workflows/super_linter.yml)
 # Web Server
 
 A simple, customizable web server implementation in Python. This project demonstrates how to build and enhance a web server, with various improvements published across different versions.
