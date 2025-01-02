@@ -4,6 +4,8 @@ WORKDIR /webServer
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-COPY . /webServer/
+COPY . .
 
-CMD [ "python3", "main.py" ]
+EXPOSE 8080
+
+CMD [ "python3", "launch.py" ]

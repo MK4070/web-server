@@ -1,0 +1,23 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: server.Dockerfile
+    container_name: server_container
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - ./logs:/webServer/logs/
+      # - ./static:/webServer/static/
+    networks:
+      - app-network
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /webServer
+
+networks:
+  app-network:
+    driver: bridge

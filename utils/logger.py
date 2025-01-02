@@ -3,12 +3,11 @@ import os
 from utils.config_reader import Config, ROOT_DIR
 
 
-config = Config.get_config()
-LOG_DIR = os.path.join(ROOT_DIR, config.get("Server", "logDirectory"))
-os.makedirs(os.path.dirname(LOG_DIR), exist_ok=True)
-
-
 def setup_loggers():
+    config = Config.get_config()
+    LOG_DIR = os.path.join(ROOT_DIR, config.get("Server", "logDirectory"))
+    os.makedirs(LOG_DIR, exist_ok=True)
+
     common_logger = logging.getLogger("common")
     common_handler = logging.FileHandler(
         os.path.join(LOG_DIR, "common.log"), "w"

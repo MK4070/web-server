@@ -55,7 +55,7 @@ def run():
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("Server stopped.")
+        print("Load balancer stopped.")
 
 
 if __name__ == "__main__":
