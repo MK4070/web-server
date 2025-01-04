@@ -32,8 +32,10 @@ git clone https://github.com/MK4070/web-server.git
 2. Navigate to the Project Directory:
 ```bash
 cd web-server
-python main.py
+python -m scripts.launch
 ```
+This will start the service at `http://127.0.0.1:8080`.
+
 
 ## Configuration 
 The server can be customized by modifying the `config.ini` file. This file allows you to set parameters such as the host, port, and other server settings.
