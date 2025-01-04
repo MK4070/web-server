@@ -8,4 +8,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD [ "python3", "launch.py" ]
+CMD [ "python3", "-m", "scripts.launch" ]
