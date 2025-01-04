@@ -27,6 +27,9 @@ Error_page = """\
 
 
 class ReverseProxyHandler(BaseHTTPRequestHandler):
+    """
+    Custom handler for load balancer.
+    """
 
     def __init__(self, *args, custom_param=None, **kwargs):
         self._setup(*custom_param)
@@ -65,6 +68,9 @@ class ReverseProxyHandler(BaseHTTPRequestHandler):
 
 
 class RequestHandler(BaseHTTPRequestHandler):
+    """
+    Custom handler for server.
+    """
 
     def handle_error(self, msg):
         """Handles errors by sending a generic error page."""
